@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const UserModel = require('./models/User')
+const SignUpModel = require('./models/SignUp')
+
 const app = express()
 app.use(cors())
 app.use(express.json())
@@ -42,6 +44,27 @@ app.get('/get-user/:id',(req,res)=>{
     UserModel.findById(id)
     .then(user=> res.json(user))
     .catch(error => console.log(error))
+})
+
+app.post('/signup',(req,res)=>{
+    SignUpModel.create(req.body)
+    .then(users=>res.json(users))
+    .catch(error=>res.json(error))
+});
+app.post('/login',(req,res)=>{
+  const {email,password} = req.body;
+  SignUpModel.findOne({email:email})
+  .then(user => {
+    if(user){
+        if(user.password === password){
+            res.json('Success')
+        }else{
+            res.json('Wrong password')
+        }
+    }else{
+        res.json('User Does Not Exist')
+    }
+  })  
 })
 app.listen(3001,()=>{
     console.log('Server is running on port 3001')
